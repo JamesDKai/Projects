@@ -9,24 +9,39 @@ class App extends React.Component {
         super(props);
 
         this.state= {
-            zipcode: '',
-            city: {},
-            dates: [],
-            selectedDate: null
+          weatherData: [],
+          zipcode: '',
+          city: {},
+          dates: [],
+          selectedDate: null
         };
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onDayClicked = this.onDayClicked.bind(this);
     }
 
+    componentDidMount(){
+        get(`http://localhost:3000/weather/`)
+          .then(({ data: weatherData }) => {
+            this.setState({weatherData});
+          });
+    }
+
     //Set the state of zipcode inside this App.js
     onFormSubmit(zipcode) {
-        // this.setState({zipcode});
-        get(`http://localhost:3000/weather/${zipcode}`)
-          .then(({ data }) => {
-          const { city, list: dates } = data;
+      const zip = zipcode * 1;
+      const {weatherData} = this.state;
+      const data = weatherData.find(w => w.id === zip);
+      const {city, list: dates} = data;
 
-          this.setState({ zipcode, city, dates, selectedDate: null });
-          });
+      this.setState({ zip, city, dates, selectedDate: null });
+        // this.setState({zipcode});
+    //     get(`http://localhost:3000/weather/${zipcode}`)
+    //       .then(({ data }) => {
+    //       const { city, list: dates } = data;
+    //
+    //       this.setState({ zipcode, city, dates, selectedDate: null });
+    //       });
+    // }
     }
 
     onDayClicked(dayIndex) {
@@ -34,10 +49,11 @@ class App extends React.Component {
     }
 
     render(){
-        const{city, dates, selectedDate} = this.state;
+        const{weatherData, city, dates, selectedDate} = this.state;
+        const zips = weatherData.map(w => w.id);
 
         return <div className="app">
-            <ZipForm onSubmit={this.onFormSubmit}/>
+            <ZipForm zips={zips} onSubmit={this.onFormSubmit}/>
             <WeatherList days={dates} onDayClicked={this.onDayClicked}/>
             {selectedDate !== null && <CurrentDay city={city} day={dates[selectedDate]}/>}
         </div>;
