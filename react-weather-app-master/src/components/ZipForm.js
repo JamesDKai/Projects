@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class ZipForm extends React.Component {
     //To manage the state of zip codes entered
@@ -34,5 +35,14 @@ class ZipForm extends React.Component {
 );
     }
 }
+
+ZipForm.PropTypes = {
+  zips: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onSubmit: PropTypes.func
+}
+
+ZipForm.defaultProps = {
+  onSubmit: () => {}
+};
 
 export default ZipForm;
